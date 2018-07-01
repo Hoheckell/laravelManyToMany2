@@ -14,4 +14,11 @@ class Professor extends Model
         return $this->belongsToMany("App\Modalidade","modalidades_professores",'professor_id','modalidade_id');
     }
 
+    public function modalidadeArray(){
+        foreach ($this->modalidades as $m){
+            $modalidades[] = $m->id;
+        }
+        return $modalidades;
+    }
+
 }

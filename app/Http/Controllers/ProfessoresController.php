@@ -89,7 +89,9 @@ class ProfessoresController extends Controller
      */
     public function edit($id)
     {
-        //
+        $modalidades = Modalidade::all();
+        $prof = Professor::find($id);
+        return view('professores.edit',['prof'=>$prof,'modalidades'=>$modalidades]);
     }
 
     /**
@@ -101,7 +103,32 @@ class ProfessoresController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'nome' => 'required',
+            'email' => 'required|email',
+            'modalidade' => 'required'
+        ]);
+
+        try {
+            DB::beginTransaction();
+            $professor = Professor::find($id);
+            $professor->nome = $request->nome;
+            $professor->email = $request->email;
+            $professor->save();
+            $professor->modalidades()->detach();
+            if(is_array($request->modalidade)) {
+                foreach ($request->modalidade as $m) {
+                    $modalidade = Modalidade::find($m);
+                    $professor->modalidades()->attach($modalidade);
+                }
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', "Professor Alterado com sucesso");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage() . " " . $e->getFile() . " " . $e->getLine());
+        }
     }
 
     /**
@@ -112,6 +139,20 @@ class ProfessoresController extends Controller
      */
     public function destroy($id)
     {
-        //
+        /*
+         * OU também:
+         * Professor::destroy($id)
+         */
+        try {
+
+            $professor = Professor::find($id);
+            $professor->delete();
+            return redirect()->back()->with('success', "Professor Excluído com sucesso");
+
+        }catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', $e->getMessage() . " " . $e->getFile() . " " . $e->getLine());
+        }
+
     }
 }

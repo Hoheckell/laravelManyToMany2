@@ -36,7 +36,10 @@
                             <td>
                                 <div class="btn-group" role="group" aria-label="Basic example">
                                     <a href="{{route('professor.edit',['id'=>$p->id])}}" class="btn btn-warning">Editar</a>
-                                    <button type="button" class="btn btn-danger">Excluir</button>
+                                    <form action="{{route('professor.destroy',['id'=>$p->id])}}" method="post">
+                                        {{csrf_field()}}{{method_field('DELETE')}}
+                                    <button type="submit" class="btn btn-danger">Excluir</button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
